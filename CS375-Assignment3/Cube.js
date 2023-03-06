@@ -3,20 +3,14 @@
 //  --- Cube.js ---
 //
 //    A simple, encapsulated Cube object
+//    Used a lot of code from 
+//    https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Creating_3D_objects_using_WebGL
+//    (wasn't able to understand assignment without it)
 
 const DefaultNumSides = 8;
 
-//
-//  All of the parameters of this function are optional, although, it's
-//    possible that the WebGL context (i.e., the "gl" parameter) may not
-//    be global, so passing that is a good idea.
-//
-//  Further, the vertex- and fragment-shader ids assume that the HTML "id" 
-//    attributes for the vertex and fragment shaders are named
-//
-//      Vertex shader:   "Cube-vertex-shader"
-//      Fragment shader: "Cube-fragment-shader"
-//
+
+
 function Cube( gl, numSides, vertexShaderId, fragmentShaderId ) {
 
     // Initialize the shader pipeline for this object using either shader ids
@@ -95,30 +89,36 @@ function Cube( gl, numSides, vertexShaderId, fragmentShaderId ) {
         // Left face
         -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0,
     ];
-        
-    // Close the triangle fan by repeating the first (non-center) point.
-    //
-    indices.push( 1 );
+    const faceColors = [
+        [1.0, 1.0, 1.0, 1.0], // Front face: white
+        [1.0, 0.0, 0.0, 1.0], // Back face: red
+        [0.0, 1.0, 0.0, 1.0], // Top face: green
+        [0.0, 0.0, 1.0, 1.0], // Bottom face: blue
+        [1.0, 1.0, 0.0, 1.0], // Right face: yellow
+        [1.0, 0.0, 1.0, 1.0], // Left face: purple
+      ];
 
-    // Record the number of indices in one of our two disks that we're using 
-    //   to make the Cube.  At this point, the indices array contains the
-    //   correct number of indices for a single disk, and as we render the
-    //   Cube as two disks of the same size (with one having its center pushed
-    //   up to make the Cube shade) , this value is precisely what we need.
-    //
+    var colors = [];
+
+    for (let j = 0; j < faceColors.length; ++j) {
+        const c = faceColors[j];
+        //repeating each color four times for each vertex of the face
+        colors = colors.concat(c, c, c, c);
+    }
+
+    for (let i = 1; i <= positions.length; i++) {
+        indices.push(i);
+    }
     const count = indices.length;
 
-    // Now build up the list for the top part of the Cube.  First, add the apex vertex onto the index and
-    //  positions arrays
-    //
-    positions.push( 0.0, 0.0, 1.0 );
-    indices.push( n + 1 );
+    //positions.push( 0.0, 0.0, 1.0 );
+    //indices.push( n + 1 );
 
     // Next, we need to append the rest of the vertices for the perimeter of the disk.
     // However, the Cube's perimeter vertices need to be reversed since it's effectively a
     // reflection of the bottom disk.
     //
-    indices = indices.concat( indices.slice( 1, n+2 ).reverse() );
+    //indices = indices.concat( indices.slice( 1, n+2 ).reverse() );
 
     // Create our vertex buffer and initialize it with our positions data
     //
