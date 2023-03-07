@@ -19,9 +19,7 @@
         //   modify an incoming vertex attribute.  They're read only.
         //
         vec4 p = aPosition;
-        p.xy -= 0.5;
-        //p.y -= 0.3;
-        //p.z -= 1.0;
+        p.xyz *= 0.5;
 
         vColor = aPosition;
 
@@ -58,13 +56,9 @@
 
         cube.P = mat4();
         cube.MV = mat4();
-        cube.P = perspective(120, 1, 0.0, 100.0);
+        //cube.P = perspective(90, 1, 0.0, 100.0);
         cube.MV = translate(cube.MV, [0.0, 0.0, -2.0]);
-        
-        
-        //cube.P = perspective(90, canvas.width/canvas.height, 0.1, 50.0);
-        //cube.MV = mat4();
-        //cube.MV = scale(cube.MV, [0.1, 0.1, 0.1]);
+        cube.MV = scale(cube.MV, [0.8, 0.8, 0.8]);
 
         render();
     }
@@ -74,8 +68,9 @@
 
         time += 0.5;
 
-        cube.MV = rotateX(time);
-        cube.MV = rotateY(time);
+        cube.MV = rotateZ(time);
+        cube.MV = mult(mult(rotateZ(time), rotateX(time)),rotateY(time));
+        //cube.MV = rotateY(time);
         //cube.MV = rotateY(time); //overwrites previous rotation
         //cube.MV = rotateX(time * 0.1); //overwrites previous rotation
         cube.render();
