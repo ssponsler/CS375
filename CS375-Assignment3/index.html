@@ -1,0 +1,89 @@
+
+<!DOCTYPE html>
+
+<script src="initShaders.js"></script>
+<script src="helpers.js"></script>
+<script src="MV.js"></script>
+<script src="Cube.js"></script>
+
+<script id="Cube-vertex-shader" type="x-shader/x-vertex">
+    in vec4 aPosition;
+
+    out vec4 vColor;
+
+    uniform mat4 P;
+    uniform mat4 MV;
+
+    void main() {
+        // We need an additional variable since we're not permitted to
+        //   modify an incoming vertex attribute.  They're read only.
+        //
+        vec4 p = aPosition;
+        p.xy -= 0.5;
+        //p.y -= 0.3;
+        //p.z -= 1.0;
+
+        vColor = aPosition;
+
+        gl_Position = P * MV * p;
+    }
+</script>
+
+<script id="Cube-fragment-shader" type="x-shader/x-fragment">
+    in vec4 vColor;
+    out vec4 fColor;
+
+    void main() {
+        const vec4 magenta = vec4(1.0, 0.0, 1.0, 1.0);
+        fColor = gl_FrontFacing ? vColor : magenta;
+    }
+</script>
+
+<!-- The following "script" is basically what you'd put into main.js -->
+<script>
+    var canvas = undefined;
+    var gl = undefined;
+    var time = 0.0;
+
+    function init() {
+        canvas = document.getElementById("canvas");
+        
+        gl = canvas.getContext("webgl2");
+        gl.clearDepth(1.0);
+        gl.enable(gl.DEPTH_TEST);
+        gl.clearColor(0.1, 0.1, 0.1, 1.0);
+        
+        
+        cube = new Cube(gl);
+
+        cube.P = mat4();
+        cube.MV = mat4();
+        cube.P = perspective(120, 1, 0.0, 100.0);
+        cube.MV = translate(cube.MV, [0.0, 0.0, -2.0]);
+        
+        
+        //cube.P = perspective(90, canvas.width/canvas.height, 0.1, 50.0);
+        //cube.MV = mat4();
+        //cube.MV = scale(cube.MV, [0.1, 0.1, 0.1]);
+
+        render();
+    }
+
+    function render() {
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        time += 0.5;
+
+        cube.MV = rotateX(time);
+        cube.MV = rotateY(time);
+        //cube.MV = rotateY(time); //overwrites previous rotation
+        //cube.MV = rotateX(time * 0.1); //overwrites previous rotation
+        cube.render();
+
+        requestAnimationFrame(render);
+    }
+
+    window.onload = init;
+</script>
+
+<canvas id="canvas" width="512" height="512"></canvas>
